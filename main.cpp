@@ -5,67 +5,58 @@
 
 using namespace std;
 
-char* portName = "\\\\.\\COM20";
+//char* portName = "\\\\.\\COM20";
 
 #define MAX_DATA_LENGTH 255
-
-char incomingData[MAX_DATA_LENGTH];
-
+#define DEL 2
 //Control signals for turning on and turning off the led
 //Check arduino code
 char ledON[] = "ON\n";
 char ledOFF[] = "OFF\n";
 
-//Arduino SerialPort object
-SerialPort *arduino;
-
-//Blinking Delay
-const unsigned int BLINKING_DELAY = 1000;
-
-//If you want to send data then define "SEND" else comment it out
-#define SEND
-
-void exampleReceiveData(void)
+void exampleReceiveData(SerialPort* arduino, char* incomingData)
 {
     int readResult = arduino->readSerialPort(incomingData, MAX_DATA_LENGTH);
-    printf("%s", incomingData);
-    Sleep(10);
+    cout << incomingData << "\n";
+    #ifdef _WIN32
+    Sleep(DEL);
+    #else
+    sleep(DEL);
+    #endif
 }
 
-void exampleWriteData(unsigned int delayTime)
+void exampleWriteData(SerialPort* arduino)
 {
     arduino->writeSerialPort(ledON, MAX_DATA_LENGTH);
-    Sleep(delayTime);
+    #ifdef _WIN32
+    Sleep(DEL);
+    #else
+    sleep(DEL);
+    #endif
     arduino->writeSerialPort(ledOFF, MAX_DATA_LENGTH);
-    Sleep(delayTime);
+    #ifdef _WIN32
+    Sleep(DEL);
+    #else
+    sleep(DEL);
+    #endif
 }
 
-void autoConnect(void)
+int main(int argc, const char* argv[])
 {
-    //wait connection
-	while (!arduino->isConnected()) {
-		Sleep(100);
-		arduino = new SerialPort(portName);
-	}
-
-    //Checking if arduino is connected or not
-	if (arduino->isConnected()) {
-		std::cout << "Connection established at port " << portName << endl;
-	}
-
-	#ifdef SEND
-        while(arduino->isConnected()) exampleWriteData(BLINKING_DELAY);
-    #else // SEND
-        while(arduino->isConnected()) exampleReceiveData();
-    #endif // SEND
-
-    //if the serial connection is lost
-	autoConnect();
-}
-
-int main()
-{
-    arduino = new SerialPort(portName);
-
-    autoConnect();   
+    char* incomingData = (char*)malloc(MAX_DATA_LENGTH);
+    if (!incomingData) {
+        cerr << "Error: buffer not allocated\n";
+        return 1;
+    } 
+    SerialPort ard(argv[1], 9600);
+    SerialPort* arduino = &ard;
+    if (!arduino) {
+        std::cerr << "Error, object non created!\n";
+    }
+    while(arduino->isConnected()) {
+        exampleWriteData(arduino);
+        exampleReceiveData(arduino, incomingData);
+    }
+    free(incomingData);
+    return 0;
 }

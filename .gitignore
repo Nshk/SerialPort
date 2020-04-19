@@ -26,3 +26,13 @@
 *.exe
 *.out
 *.app
+
+# Emacs files
+*~
+
+# The bin dir
+bin/
+# Everything in the build directory except BUILD_HERE.txt
+build/CMake*
+build/Make*
+build/cmake*

@@ -1,0 +1,4 @@
+To build this project:
+
+cmake ..
+make
