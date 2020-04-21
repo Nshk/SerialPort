@@ -180,7 +180,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
     #endif
 
     memset(buffer, 0, buf_size);
-    #ifdef __WIN32
+    #ifdef _WIN32
     if (ReadFile(handler, buffer, toRead, &bytesRead, NULL))
     {
         return bytesRead;
