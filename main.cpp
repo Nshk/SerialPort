@@ -14,48 +14,45 @@ using namespace std;
 char ledON[] = "ON\n";
 char ledOFF[] = "OFF\n";
 
-void exampleReceiveData(SerialPort* arduino, char* incomingData)
+void slp()
 {
-    int readResult = arduino->readSerialPort(incomingData, MAX_DATA_LENGTH);
-    cout << incomingData << "\n";
-    #ifdef _WIN32
+#ifdef _WIN32
     Sleep(DEL);
-    #else
+#else
     sleep(DEL);
-    #endif
+#endif    
 }
 
-void exampleWriteData(SerialPort* arduino)
+void exampleReceiveData(SerialPort& ser, char* incomingData)
 {
-    arduino->writeSerialPort(ledON, MAX_DATA_LENGTH);
-    #ifdef _WIN32
-    Sleep(DEL);
-    #else
-    sleep(DEL);
-    #endif
-    arduino->writeSerialPort(ledOFF, MAX_DATA_LENGTH);
-    #ifdef _WIN32
-    Sleep(DEL);
-    #else
-    sleep(DEL);
-    #endif
+    int readResult = ser.readSerialPort(incomingData, MAX_DATA_LENGTH);
+    cout << incomingData << "\n";
+    slp();
+}
+
+void exampleWriteData(SerialPort& ser)
+{
+    ser.writeSerialPort(ledON, MAX_DATA_LENGTH);
+    slp();
+    ser.writeSerialPort(ledOFF, MAX_DATA_LENGTH);
+    slp();
 }
 
 int main(int argc, const char* argv[])
 {
+    if (argc != 2) {
+        std::cout << "Usage: " << argv[0] <<  " serial_path_or_name\n";
+        return 1;
+    }
     char* incomingData = (char*)malloc(MAX_DATA_LENGTH);
     if (!incomingData) {
         cerr << "Error: buffer not allocated\n";
         return 1;
     } 
-    SerialPort ard(argv[1], 9600);
-    SerialPort* arduino = &ard;
-    if (!arduino) {
-        std::cerr << "Error, object non created!\n";
-    }
-    while(arduino->isConnected()) {
-        exampleWriteData(arduino);
-        exampleReceiveData(arduino, incomingData);
+    SerialPort serial(argv[1], 9600);
+    while(serial.isConnected()) {
+        exampleWriteData(serial);
+        exampleReceiveData(serial, incomingData);
     }
     free(incomingData);
     return 0;

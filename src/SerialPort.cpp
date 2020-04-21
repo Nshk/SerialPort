@@ -144,9 +144,9 @@ SerialPort::SerialPort(const char *portName, long unsigned int baud)
         // Save tty settings, also checking for error
         if (tcsetattr(handler, TCSANOW, &tty) != 0) {
             printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
+        } else {
+            connected = true;
         }
-        std::cout << "Connected to "<< portName << "\n";
-        connected = true;
     }
     #endif
 }
@@ -191,10 +191,11 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
     if (r >= 0) {
         return r;
     } else {
-        std::cerr << "Error reading the serial port.\n";
+        perror("read: ");
+        connected = false;
     }
     #endif
-    return 0;
+    return -1;
 }
 
 // Sending provided buffer to serial port;
@@ -211,7 +212,8 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
     }
     #else
     if (write(handler, buffer, buf_size) < buf_size) {
-        std::cerr << "Error writing to the serial port.\n";
+        perror("write: ");
+        connected = false;
         return false;
     }
     #endif
@@ -227,13 +229,12 @@ bool SerialPort::isConnected()
         connected = false;
     }
     #endif
-
     return connected;
 }
 
 void SerialPort::closeSerial()
 {
-    printf("Closing Serial\n");
+    std::cout << "Closing Serial\n";
     connected = false;
     #ifdef _WIN32
     CloseHandle(handler);
