@@ -9,33 +9,24 @@ using namespace std;
 
 #define MAX_DATA_LENGTH 255
 #define DEL 2
-//Control signals for turning on and turning off the led
-//Check arduino code
-char ledON[] = "ON\n";
-char ledOFF[] = "OFF\n";
 
-void slp()
+void slp(int s)
 {
 #ifdef _WIN32
-    Sleep(DEL);
+        Sleep(s);
 #else
-    sleep(DEL);
-#endif    
+        sleep(s);
+#endif
 }
 
 void exampleReceiveData(SerialPort& ser, char* incomingData)
 {
     int readResult = ser.readSerialPort(incomingData, MAX_DATA_LENGTH);
-    cout << incomingData << "\n";
-    slp();
 }
 
 void exampleWriteData(SerialPort& ser)
 {
-    ser.writeSerialPort(ledON, MAX_DATA_LENGTH);
-    slp();
-    ser.writeSerialPort(ledOFF, MAX_DATA_LENGTH);
-    slp();
+    ser.writeSerialPort("PING\n", MAX_DATA_LENGTH);
 }
 
 int main(int argc, const char* argv[])
@@ -52,7 +43,11 @@ int main(int argc, const char* argv[])
     SerialPort serial(argv[1], 9600);
     while(serial.isConnected()) {
         exampleWriteData(serial);
+        cout << "Sent PING\n";
+        slp(1);
         exampleReceiveData(serial, incomingData);
+        cout << "Received " << incomingData;
+        slp(1);
     }
     free(incomingData);
     return 0;

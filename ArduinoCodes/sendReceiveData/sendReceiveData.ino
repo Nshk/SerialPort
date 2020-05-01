@@ -10,24 +10,16 @@
 String receivedString;
 
 void setup() {
-  Serial.begin(BAUD);
-  pinMode(led, OUTPUT);
+    Serial.begin(BAUD);
 }
 
 void loop() {
-  if (Serial.available() > 0){
-    receivedString = Serial.readStringUntil('\n');
-  }
-
-  if (receivedString.equals("ON")) {
-    digitalWrite(led, HIGH);  
-  } else if (receivedString.equals("OFF")) {
-    digitalWrite(led, LOW);
-  }
-  if (!receivedString.equals(""))  {
-    Serial.print("You sent: ");
-    Serial.print(receivedString);
-    Serial.print("\n");
-    receivedString = "";
-  }
+    if (Serial.available() > 0){
+        receivedString = Serial.readStringUntil('\n');
+    }
+    
+    if (receivedString.equals("PING"))  {
+        Serial.print("PONG\n");
+        receivedString = "";
+    }
 }

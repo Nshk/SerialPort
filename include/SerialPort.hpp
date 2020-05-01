@@ -37,7 +37,7 @@ public:
     ~SerialPort();
 
     int readSerialPort(char *buffer, unsigned int buf_size);
-    bool writeSerialPort(char *buffer, unsigned int buf_size);
+    bool writeSerialPort(const char *data, unsigned int buf_size);
     bool isConnected();
     void closeSerial();
 };

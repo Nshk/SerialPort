@@ -200,7 +200,7 @@ int SerialPort::readSerialPort(char *buffer, unsigned int buf_size)
 
 // Sending provided buffer to serial port;
 // returns true if succeed, false if not
-bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size)
+bool SerialPort::writeSerialPort(const char *buffer, unsigned int buf_size)
 {
     #ifdef _WIN32
     DWORD bytesSend;
